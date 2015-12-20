@@ -8,10 +8,6 @@ For an example of use, see [X1011/verge-mobile-bingo](https://github.com/X1011/v
 
 Download the script and make sure it is executable: (`wget https://github.com/X1011/git-directory-deploy/raw/master/deploy.sh && chmod +x deploy.sh`). That's it!
 
-## repository setup
-
-TBD
-
 ## run
 Do this every time you want to deploy, or have your CI server do it.
 
