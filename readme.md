@@ -8,6 +8,28 @@ For an example of use, see [X1011/verge-mobile-bingo](https://github.com/X1011/v
 
 Download the script and make sure it is executable: (`wget https://github.com/X1011/git-directory-deploy/raw/master/deploy.sh && chmod +x deploy.sh`). That's it!
 
+## configuration
+
+- **deploy_directory**: root of the tree of files to deploy
+- **deploy_branch**: branch to commit files to and push to origin
+- **default_username**, **default_email**: identity to use for git commits if none is set already. Useful for CI servers.
+- **repo**: repository to deploy to. Must be readable and writable. The default of "origin" will not work on Travis CI, since it uses the read-only git protocol. In that case, it is recommended to store a [GitHub token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) in a [secure environment variable](http://docs.travis-ci.com/user/environment-variables/#Secure-Variables) and use it in an HTTPS URL like this: <code>repo=https://$GITHUB_TOKEN@github\.com/<i>user</i>/<i>repo</i>.git</code> **Warning: there is currently [an issue](https://github.com/X1011/git-directory-deploy/issues/7) where the repo URL may be output if an operation fails.**
+
+You can also define any of variables using environment variables and configuration files:
+
+- `GIT_DEPLOY_DIR`
+- `GIT_DEPLOY_BRANCH`
+- `GIT_DEPLOY_REPO`
+
+The script will set these variables in this order of preference:
+
+1. Defaults set in the script itself.
+2. Environment variables.
+3. `.env` file in the path where you're running the script.
+4. File specified on the command-line (see the `-c` option below).
+
+Whatever values set later in this list will override those set earlier.
+
 ## run
 Do this every time you want to deploy, or have your CI server do it.
 
@@ -36,25 +58,3 @@ Available options:
 `-v`, `--verbose`: echo expanded commands as they are executed, using the xtrace option. This can be useful for debugging, as the output will include the values of variables that are being used, such as $commit_title and $deploy_directory. However, the script makes special effort to not output the value of $repo, as it may contain a secret authentication token.
 
 `-e`, `--allow-empty`: allow deployment of an empty directory. By default, the script will abort if `deploy_directory` is empty.
-
-## configuration
-
-- **deploy_directory**: root of the tree of files to deploy
-- **deploy_branch**: branch to commit files to and push to origin
-- **default_username**, **default_email**: identity to use for git commits if none is set already. Useful for CI servers.
-- **repo**: repository to deploy to. Must be readable and writable. The default of "origin" will not work on Travis CI, since it uses the read-only git protocol. In that case, it is recommended to store a [GitHub token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) in a [secure environment variable](http://docs.travis-ci.com/user/environment-variables/#Secure-Variables) and use it in an HTTPS URL like this: <code>repo=https://$GITHUB_TOKEN@github\.com/<i>user</i>/<i>repo</i>.git</code> **Warning: there is currently [an issue](https://github.com/X1011/git-directory-deploy/issues/7) where the repo URL may be output if an operation fails.**
-
-You can also define any of variables using environment variables and configuration files:
-
-- `GIT_DEPLOY_DIR`
-- `GIT_DEPLOY_BRANCH`
-- `GIT_DEPLOY_REPO`
-
-The script will set these variables in this order of preference:
-
-1. Defaults set in the script itself.
-2. Environment variables.
-3. `.env` file in the path where you're running the script.
-4. File specified on the command-line (see the `-c` option below).
-
-Whatever values set later in this list will override those set earlier.
