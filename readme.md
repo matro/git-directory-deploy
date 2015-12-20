@@ -18,6 +18,13 @@ Do this every time you want to deploy, or have your CI server do it.
 5. run `./deploy.sh`
 
 ### options
+
+This is the syntax for setting the script's options on the command-line:
+
+`deploy.sh [-c <FILE>] [<options>]`
+
+Available options:
+
 `-h`, `--help`: show the program's help info.
 
 `-c`, `--config-file`: specify a file that overrides the script's default configuration, or those values set in `.env`. The syntax for this file should be normal `var=value` declarations. __This option _must_ come first on the command-line__.
