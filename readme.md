@@ -10,22 +10,21 @@ Download the script and make sure it is executable: (`wget https://github.com/X1
 
 ## configuration
 
+These are the variables that the script uses for its settings:
+
 - `GIT_DEPLOY_DIR`: root of the tree of files to deploy
 - `GIT_DEPLOY_BRANCH`: branch to commit files to and push to origin
 - `GIT_DEPLOY_USERNAME`: name used for git commits made by the script. Useful for CI servers.
 - `GIT_DEPLOY_EMAIL`: email address used for git commits. Useful for CI servers.
 - `GIT_DEPLOY_REPO`: repository to deploy to. Must be readable and writable. The default of "origin" will not work on Travis CI, since it uses the read-only git protocol. In that case, it is recommended to store a [GitHub token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) in a [secure environment variable](http://docs.travis-ci.com/user/environment-variables/#Secure-Variables) and use it in an HTTPS URL like this: <code>repo=https://$GITHUB_TOKEN@github\.com/<i>user</i>/<i>repo</i>.git</code> **Warning: there is currently [an issue](https://github.com/X1011/git-directory-deploy/issues/7) where the repo URL may be output if an operation fails.**
 
-You can also define any of variables using environment variables and configuration files:
+These variables can be set in a number of different places, and will be set or overridden like this:
 
-The script will set these variables in this order of preference:
-
-1. Defaults set in the script itself.
-2. Environment variables.
-3. `.env` file in the path where you're running the script.
-4. File specified on the command-line (see the `-c` option below).
-
-Whatever values set later in this list will override those set earlier.
+1. If nothing is specified the script uses its internal defaults.
+2. An environment variable overrides the script's defaults.
+3. A variable set in an `.env` file where you're running the script overrides an environment variable.
+4. A variable set in a file specified on the command-line (see the `-c`/`--config` option) overrides `.env` and the environment.
+5. Command-line options override everything.
 
 ## run
 Do this every time you want to deploy, or have your CI server do it.
