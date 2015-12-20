@@ -12,7 +12,8 @@ Download the script and make sure it is executable: (`wget https://github.com/X1
 
 - `GIT_DEPLOY_DIR`: root of the tree of files to deploy
 - `GIT_DEPLOY_BRANCH`: branch to commit files to and push to origin
-- `GIT_DEPLOY_USERNAME`, `GIT_DEPLOY_EMAIL`: identity to use for git commits if none is set already. Useful for CI servers.
+- `GIT_DEPLOY_USERNAME`: name used for git commits made by the script. Useful for CI servers.
+- `GIT_DEPLOY_EMAIL`: email address used for git commits. Useful for CI servers.
 - `GIT_DEPLOY_REPO`: repository to deploy to. Must be readable and writable. The default of "origin" will not work on Travis CI, since it uses the read-only git protocol. In that case, it is recommended to store a [GitHub token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) in a [secure environment variable](http://docs.travis-ci.com/user/environment-variables/#Secure-Variables) and use it in an HTTPS URL like this: <code>repo=https://$GITHUB_TOKEN@github\.com/<i>user</i>/<i>repo</i>.git</code> **Warning: there is currently [an issue](https://github.com/X1011/git-directory-deploy/issues/7) where the repo URL may be output if an operation fails.**
 
 You can also define any of variables using environment variables and configuration files:
