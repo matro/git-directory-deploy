@@ -56,7 +56,7 @@ parse_args() {
 	while : ; do
 		if [[ $1 = "-h" || $1 = "--help" ]]; then
 			echo "$help_message"
-			return 0
+			exit 0
 		elif [[ $1 = "-v" || $1 = "--verbose" ]]; then
 			verbose=true
 			shift
