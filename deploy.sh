@@ -35,7 +35,8 @@ Positional Args:
 At the end of the command, you can optionally specify the directory, branch,
 and repository as well. Earlier values are required to specify later ones. For
 example, in order to specify <branch>, you must also specify <directory>. Like
-the command-line options, these"
+the command-line options, these will override values set in configuration files
+and the environment."
 
 parse_args() {
 	# Set args from a local environment file.
