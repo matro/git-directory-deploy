@@ -12,11 +12,26 @@ Download the script and make sure it is executable: (`wget https://github.com/X1
 
 These are the variables that the script uses for its settings:
 
-- `GIT_DEPLOY_DIR`: root of the tree of files to deploy
-- `GIT_DEPLOY_BRANCH`: branch to commit files to and push to origin
-- `GIT_DEPLOY_USERNAME`: name used for git commits made by the script. Useful for CI servers.
-- `GIT_DEPLOY_EMAIL`: email address used for git commits. Useful for CI servers.
-- `GIT_DEPLOY_REPO`: repository to deploy to. Must be readable and writable. The default of "origin" will not work on Travis CI, since it uses the read-only git protocol. In that case, it is recommended to store a [GitHub token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) in a [secure environment variable](http://docs.travis-ci.com/user/environment-variables/#Secure-Variables) and use it in an HTTPS URL like this: <code>repo=https://$GITHUB_TOKEN@github\.com/<i>user</i>/<i>repo</i>.git</code> **Warning: there is currently [an issue](https://github.com/X1011/git-directory-deploy/issues/7) where the repo URL may be output if an operation fails.**
+- `GIT_DEPLOY_DIR`
+   - Folder containing the files to deploy
+   - Default: `./dist`
+- `GIT_DEPLOY_BRANCH`
+   - Dranch to which the deployed files are committed
+   - Default: `gh-pages`
+- `GIT_DEPLOY_USERNAME`
+   - Name used for git commits made by the script
+   - Default: `deploy.sh`
+   - Useful for running on a CI server.
+- `GIT_DEPLOY_EMAIL`
+   - Email address used for git commits.
+   - Default: `<empty>`
+   - Useful for running on a CI server.
+- `GIT_DEPLOY_REPO`
+   - Remote repository to deploy to.
+   - Default: `origin`
+   - This remote _must_ be readable and writable.
+   - _Note_ - The default of "origin" will not work on Travis CI, since it uses the read-only git protocol. In that case, it is recommended to store a [GitHub token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) in a [secure environment variable](http://docs.travis-ci.com/user/environment-variables/#Secure-Variables) and use it in an HTTPS URL like this: <code>repo=https://$GITHUB_TOKEN@github\.com/<i>user</i>/<i>repo</i>.git</code>
+   - **Warning: there is currently [an issue](https://github.com/X1011/git-directory-deploy/issues/7) where the repo URL may be output if an operation fails.**
 
 These variables can be set in a number of different places, and will be set or overridden like this:
 
