@@ -8,38 +8,61 @@ For an example of use, see [X1011/verge-mobile-bingo](https://github.com/X1011/v
 
 Download the script and make sure it is executable: (`wget https://github.com/X1011/git-directory-deploy/raw/master/deploy.sh && chmod +x deploy.sh`). That's it!
 
-## configuration
+## options & settings
 
-These are the variables that the script uses for its settings:
+The script looks for settings in a few places, in this order:
 
-- `GIT_DEPLOY_DIR`
-   - Folder containing the files to deploy
-   - Default: `./dist`
-- `GIT_DEPLOY_BRANCH`
-   - Dranch to which the deployed files are committed
-   - Default: `gh-pages`
-- `GIT_DEPLOY_USERNAME`
-   - Name used for git commits made by the script
-   - Default: `deploy.sh`
-   - Useful for running on a CI server.
-- `GIT_DEPLOY_EMAIL`
-   - Email address used for git commits.
-   - Default: `<empty>`
-   - Useful for running on a CI server.
-- `GIT_DEPLOY_REPO`
-   - Remote repository to deploy to. It can be either a named remote, or a URL.
-   - Default: `origin`
-   - This remote _must_ be readable and writable.
-   - _Note_ - The default of "origin" will not work on Travis CI, since it uses the read-only git protocol. In that case, it is recommended to store a [GitHub token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) in a [secure environment variable](http://docs.travis-ci.com/user/environment-variables/#Secure-Variables) and use it in an HTTPS URL like this: <code>repo=https://$GITHUB_TOKEN@github\.com/<i>user</i>/<i>repo</i>.git</code>
-   - **Warning: there is currently [an issue](https://github.com/X1011/git-directory-deploy/issues/7) where the repo URL may be output if an operation fails.**
+ 1. Environment variables.
+ 2. Your project's "dotenv" file (`.env`), if it exists.
+ 3. A configuration file specified in the command-line.
+ 4. Specific values specified on the command-line.
+ 
+Settings set in later places will override those set earlier. For anything that doesn't get set in any of these places, the script will fall back on its built-in defaults.
 
-These variables can be set in a number of different places, and will be set or overridden like this:
+### commmand-line:
 
-1. If nothing is specified the script uses its internal defaults.
-2. An environment variable overrides the script's defaults.
-3. A variable set in an `.env` file where you're running the script overrides an environment variable.
-4. A variable set in a file specified on the command-line (see the `-c`/`--config` option) overrides `.env` and the environment.
-5. Command-line options override everything.
+```
+deploy.sh [-c <FILE>] [<options>] [<directory> [<branch> [<repo>]]]
+```
+
+### list of options
+
+- `-h`, `--help`: show the program's help info.
+
+- `-c`, `--config-file`: specify a configuration file.
+   - This option **_must_ come first** on the command-line.
+   - Syntax for this file (and `.env`) should be compatible with [other "dotenv" libraries](https://duckduckgo.com/?q=dotenv): 
+   
+     ```
+     # Comment
+     VAR_1=value
+     VAR_2="another value"
+     ```
+
+- `-m`, `--message <message>`: specify message to be used for the commit on `deploy_branch`. By default, the message is the title of the source commit, prepended with 'publish: '.
+
+- `-n`, `--no-hash`: don't append the hash of the source commit to the commit message.
+   - By default, the hash will be appended in a new paragraph, regardless of whether a message was specified with `-m`.
+   - Set with `GIT_DEPLOY_APPEND_HASH` (default: `true`).
+
+- `-v`, `--verbose`: echo expanded commands as they are executed, using the xtrace option.
+   - This can be useful for debugging, as the output will include the values of internal variables, such as `$commit_title` and `$deploy_directory`. However, the script makes special effort to not output the value of `$repo`, as it may contain a secret authentication token.
+
+- `-e`, `--allow-empty`: allow deployment of an empty directory.
+    - By default, the script will abort if the deploy directory is empty. Letting the script complete can be useful for troubleshooting though.
+
+- `<directory> [<branch> [<repo>]]`: the source and target of the deployment. These can also be set with these variables:
+   - `GIT_DEPLOY_DIR`: folder containing the files to deploy. If this folder doesn't exist (or is empty), the script will abort. Defaults to `./dist`.
+   - `GIT_DEPLOY_BRANCH`: branch to which the deployable files are committed. If this branch doesn't exist, the script will automatically create it. Defaults to `gh-pages`.
+   - `GIT_DEPLOY_REPO`: remote repository to deploy to. It can be either a named remote, or a URL. Defaults to `origin`.
+      - This remote _must_ be readable and writable, as the script will push the deploy-branch to it, or fail.
+      - _Note_ - The default of "origin" will not work on Travis CI, or any other utility that uses the read-only git protocol. In these cases, it is recommended to store a [GitHub token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) in a [secure environment variable](http://docs.travis-ci.com/user/environment-variables/#Secure-Variables) and use it in an HTTPS URL like this: <code>GIT_DEPLOY_REPO=https://$GITHUB_TOKEN@github\.com/<i>user</i>/<i>repo</i>.git</code>
+      - **Warning: there is currently [an issue](https://github.com/X1011/git-directory-deploy/issues/7) where the repo URL may be output if an operation fails.**
+
+- _Commiter identity_: attribution info used in script's git commits.
+   - `GIT_DEPLOY_USERNAME`: committer name. Defaults to `deploy.sh`.
+   - `GIT_DEPLOY_EMAIL`: committer email address. Defaults to `<empty>`.
+   - This is useful for running deployments from a CI server, and otherwise showing who made what deployments from where in the commit log.
 
 ## run
 Do this every time you want to deploy, or have your CI server do it.
@@ -49,23 +72,3 @@ Do this every time you want to deploy, or have your CI server do it.
 3. make sure you have no uncommitted changes in git's index. The script will abort if you do. (It's ok to have uncommitted files in the work tree; the script does not touch the work tree.)
 4. if `deploy_directory` is a relative path (the default is), make sure you are in the directory you want to resolve against. (For the default, this means you should be in the project's root.)
 5. run `./deploy.sh`
-
-### options
-
-This is the syntax for setting the script's options on the command-line:
-
-`deploy.sh [-c <FILE>] [<options>]`
-
-Available options:
-
-`-h`, `--help`: show the program's help info.
-
-`-c`, `--config-file`: specify a file that overrides the script's default configuration, or those values set in `.env`. The syntax for this file should be normal `var=value` declarations. __This option _must_ come first on the command-line__.
-
-`-m`, `--message <message>`: specify message to be used for the commit on `deploy_branch`. By default, the message is the title of the source commit, prepended with 'publish: '.
-
-`-n`, `--no-hash`: don't append the hash of the source commit to the commit message on `deploy_branch`. By default, the hash will be appended in a new paragraph, regardless of whether a message was specified with `-m`.
-
-`-v`, `--verbose`: echo expanded commands as they are executed, using the xtrace option. This can be useful for debugging, as the output will include the values of variables that are being used, such as $commit_title and $deploy_directory. However, the script makes special effort to not output the value of $repo, as it may contain a secret authentication token.
-
-`-e`, `--allow-empty`: allow deployment of an empty directory. By default, the script will abort if `deploy_directory` is empty.
