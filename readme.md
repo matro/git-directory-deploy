@@ -27,7 +27,7 @@ These are the variables that the script uses for its settings:
    - Default: `<empty>`
    - Useful for running on a CI server.
 - `GIT_DEPLOY_REPO`
-   - Remote repository to deploy to.
+   - Remote repository to deploy to. It can be either a named remote, or a URL.
    - Default: `origin`
    - This remote _must_ be readable and writable.
    - _Note_ - The default of "origin" will not work on Travis CI, since it uses the read-only git protocol. In that case, it is recommended to store a [GitHub token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) in a [secure environment variable](http://docs.travis-ci.com/user/environment-variables/#Secure-Variables) and use it in an HTTPS URL like this: <code>repo=https://$GITHUB_TOKEN@github\.com/<i>user</i>/<i>repo</i>.git</code>
