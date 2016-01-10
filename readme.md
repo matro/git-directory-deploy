@@ -25,7 +25,7 @@ Settings set in later places will override those set earlier. For anything that 
 deploy.sh [-c <FILE>] [<options>] [<directory> [<branch> [<repo>]]]
 ```
 
-### list of options
+### options & settings
 
 - `-h`, `--help`: show the program's help info.
 
@@ -39,30 +39,40 @@ deploy.sh [-c <FILE>] [<options>] [<directory> [<branch> [<repo>]]]
      VAR_2="another value"
      ```
 
-- `-m`, `--message <message>`: specify message to be used for the commit on `deploy_branch`. By default, the message is the title of the source commit, prepended with 'publish: '.
+- `-m`, `--message <message>`: specify message to be used when committing to the deployed branch.
+   - By default, the message is the title of the source commit, prepended with `publish: `.
 
-- `-n`, `--no-hash`: don't append the hash of the source commit to the commit message.
-   - By default, the hash will be appended in a new paragraph, regardless of whether a message was specified with `-m`.
-   - Set with `GIT_DEPLOY_APPEND_HASH` (default: `true`).
+- `-n`, `--no-hash`: skip appending the hash of the source commit to the commit message.
+   - The hash would otherwise be appended as a new paragraph in the commit message, keeping it separate from the text (see `-m`).
+   - Setting: `GIT_DEPLOY_APPEND_HASH` (default: `true`).
 
-- `-v`, `--verbose`: echo expanded commands as they are executed, using the xtrace option.
+- `-v`, `--verbose`: echo expanded commands as they are executed.
    - This can be useful for debugging, as the output will include the values of internal variables, such as `$commit_title` and `$deploy_directory`. However, the script makes special effort to not output the value of `$repo`, as it may contain a secret authentication token.
 
-- `-e`, `--allow-empty`: allow deployment of an empty directory.
-    - By default, the script will abort if the deploy directory is empty. Letting the script complete can be useful for troubleshooting though.
+- `-e`, `--allow-empty`: allow committing and deployment of an empty directory.
+    - Without this option, the script will abort if the deploy directory is empty. This is normally a good safety feature, but overriding it can sometimes or useful or necessary.
 
 - `<directory> [<branch> [<repo>]]`: the source and target of the deployment. These can also be set with these variables:
-   - `GIT_DEPLOY_DIR`: folder containing the files to deploy. If this folder doesn't exist (or is empty), the script will abort. Defaults to `./dist`.
-   - `GIT_DEPLOY_BRANCH`: branch to which the deployable files are committed. If this branch doesn't exist, the script will automatically create it. Defaults to `gh-pages`.
-   - `GIT_DEPLOY_REPO`: remote repository to deploy to. It can be either a named remote, or a URL. Defaults to `origin`.
-      - This remote _must_ be readable and writable, as the script will push the deploy-branch to it, or fail.
-      - _Note_ - The default of "origin" will not work on Travis CI, or any other utility that uses the read-only git protocol. In these cases, it is recommended to store a [GitHub token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) in a [secure environment variable](http://docs.travis-ci.com/user/environment-variables/#Secure-Variables) and use it in an HTTPS URL like this: <code>GIT_DEPLOY_REPO=https://$GITHUB_TOKEN@github\.com/<i>user</i>/<i>repo</i>.git</code>
-      - **Warning: there is currently [an issue](https://github.com/X1011/git-directory-deploy/issues/7) where the repo URL may be output if an operation fails.**
+   - `GIT_DEPLOY_DIR`: folder containing the files to deploy.
+      - If this folder doesn't exist (or is empty, see `-e`), the script will abort. It's up to your project's init/build processes to create and populate this folder.
+      - Default: `./dist`
+   - `GIT_DEPLOY_BRANCH`: branch to which the deployable files are committed.
+      - If this branch doesn't exist, the script will automatically create it. After this branch is committed to, it will also be automatically pushed.
+      - Default: `gh-pages`
+   - `GIT_DEPLOY_REPO`: remote repository to deploy to.
+      - It can be either a named remote, or any URL that Git can push to.
+      - This remote _must_ be readable and writable, as the script will push the deploy-branch to it. If remote is read-only, the script will fail.
+      - Default: `origin`
+      - _Note_ - The default of "origin" will not work on Travis CI, or any other utility that uses the read-only git protocol. In these cases, it is recommended to store a [GitHub token](https://help.github.com/articles/creating-an-access-token-for-command-line-use) in a [secure environment variable](http://docs.travis-ci.com/user/environment-variables/#Secure-Variables) and use it in an HTTPS URL like this:
+      <code>
+      GIT_DEPLOY_REPO=https://<strong>$GITHUB_TOKEN</strong>@github\.com/<em>user</em>/<em>repo</em>.git
+      </code>
+      - **Warning** - there is currently [an issue](https://github.com/X1011/git-directory-deploy/issues/7) where the repo URL may be output if an operation fails.
 
 - _Commiter identity_: attribution info used in script's git commits.
    - `GIT_DEPLOY_USERNAME`: committer name. Defaults to `deploy.sh`.
    - `GIT_DEPLOY_EMAIL`: committer email address. Defaults to `<empty>`.
-   - This is useful for running deployments from a CI server, and otherwise showing who made what deployments from where in the commit log.
+   - Setting these in your different environments (such as your CI server vs local machine) is useful showing who made what deployments from where in the commit log.
 
 ## run
 Do this every time you want to deploy, or have your CI server do it.
