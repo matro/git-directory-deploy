@@ -8,22 +8,40 @@ For an example of use, see [X1011/verge-mobile-bingo](https://github.com/X1011/v
 
 Download the script and make sure it is executable: (`wget https://github.com/X1011/git-directory-deploy/raw/master/deploy.sh && chmod +x deploy.sh`). That's it!
 
-## options & settings
+## usage
+
+To use this script in a deployment, follow this basic workflow:
+
+1. `git checkout` the commit (or branch or tag) of your project that you want to deploy.
+2. Generate a complete copy of the files you want to deploy in some folder within your project.
+   - This folder should probably be in your project's `.gitignore`. You don't want to accidentally commit this folder to your main branch hierarchy, after all. That's what this script is for!
+   - Populating your "deploy folder" is out of this script's scope, and largely depends on the specifics of your project. This is where you'd run something like `make build`, a static site generator, etc.
+3. Make sure your working directory is clean.
+   - If you have uncommitted changes in git's _index_, the script will abort. The script needs a clean index in order to function.
+   - If you have uncommitted files in the _work tree_, that's okay; the script does not touch the work tree, and checking for this should instead be the responsibility of your project's build process.
+4. Run `deploy.sh` from your project's root.
+   - If your project's needs match the script's defaults then that's it!
+   - Different projects have different needs, names for the "deploy folder", "deploy branch", and other details. You may even see fit to deploy multiple parts of your project with this script, using vastly different settings. All of this is possible, by using configuration files and command-line options detailed below.
+   - The key though, is that the script looks for _everything_ at paths relative to where you run it. Make sure you're running the script in the correct folder.
+
+Following this workflow by hand can be tedious and error-prone, especially if you're using non-default settings. Rather than just running the script, we definitely recommend using this script in an automated build/deployment routine of some kind. Then, you (or your CI server) can make a deployment in a single step.
+
+### the commmand-line:
+
+```
+deploy.sh [-c <CONFIG_FILE>] [<options>] [<directory> [<branch> [<repo>]]]
+```
+
+### configuration
 
 The script looks for settings in a few places, in this order:
 
  1. Environment variables.
- 2. Your project's "dotenv" file (`.env`), if it exists.
- 3. A configuration file specified in the command-line.
- 4. Specific values specified on the command-line.
+ 2. An `.env` file (if it exists).
+ 3. A configuration file, if it is specified on the command-line.
+ 4. Values specified on the command-line.
  
 Settings set in later places will override those set earlier. For anything that doesn't get set in any of these places, the script will fall back on its built-in defaults.
-
-### commmand-line:
-
-```
-deploy.sh [-c <FILE>] [<options>] [<directory> [<branch> [<repo>]]]
-```
 
 ### options & settings
 
@@ -73,12 +91,3 @@ deploy.sh [-c <FILE>] [<options>] [<directory> [<branch> [<repo>]]]
    - `GIT_DEPLOY_USERNAME`: committer name. Defaults to `deploy.sh`.
    - `GIT_DEPLOY_EMAIL`: committer email address. Defaults to `<empty>`.
    - Setting these in your different environments (such as your CI server vs local machine) is useful showing who made what deployments from where in the commit log.
-
-## run
-Do this every time you want to deploy, or have your CI server do it.
-
-1. check out the branch or commit of the source you want to use. The script will use this commit to generate a message when it makes its own commit on the deploy branch.
-2. generate the files in `deploy_directory`
-3. make sure you have no uncommitted changes in git's index. The script will abort if you do. (It's ok to have uncommitted files in the work tree; the script does not touch the work tree.)
-4. if `deploy_directory` is a relative path (the default is), make sure you are in the directory you want to resolve against. (For the default, this means you should be in the project's root.)
-5. run `./deploy.sh`
