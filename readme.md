@@ -36,12 +36,20 @@ deploy.sh [-c <CONFIG_FILE>] [<options>] [<directory> [<branch> [<repo>]]]
 
 The script looks for settings in a few places, in this order:
 
- 1. Environment variables. Look for `GIT_DEPLOY_VAR_NAME` 
+ 1. Environment variables.
  2. An `.env` file (if it exists).
  3. A configuration file, if it is specified on the command-line.
  4. Values specified on the command-line.
  
 Settings set in later places will override those set earlier. For anything that doesn't get set in any of these places, the script will fall back on its built-in defaults.
+
+For for settings exposed as variables, look for `GIT_DEPLOY_VAR` variable names in the options and settings below. The syntax for `.env` and other configuration files should be compatible with [other "dotenv" libraries](https://duckduckgo.com/?q=dotenv): 
+   
+```
+# A Comment
+VAR_1=value
+VAR_2="another value"
+```
 
 ### options & settings
 
@@ -49,13 +57,6 @@ Settings set in later places will override those set earlier. For anything that 
 
 - `-c`, `--config-file`: specify a configuration file.
    - This option **_must_ come first** on the command-line.
-   - Syntax for this file (and `.env`) should be compatible with [other "dotenv" libraries](https://duckduckgo.com/?q=dotenv): 
-   
-     ```
-     # Comment
-     VAR_1=value
-     VAR_2="another value"
-     ```
 
 - `-m`, `--message <message>`: specify message to be used when committing to the deployed branch.
    - By default, the message is the title of the source commit, prepended with `publish: `.
