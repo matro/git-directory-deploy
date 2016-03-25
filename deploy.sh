@@ -3,7 +3,7 @@ set -o errexit #abort if any command fails
 me=$(basename "$0")
 
 help_message="\
-Usage: $me [-c FILE] [<options>]
+Usage: $me [-c <FILE>] [<options>] [<directory> [<branch> [<repository>]]]
 Deploy generated files to a git branch.
 
 Options:
@@ -15,7 +15,7 @@ Options:
                            deploy branch.
   -n, --no-hash            Don't append the source commit's hash to the deploy
                            commit's message.
-  -c, --config-file PATH   Override default & environment variables' values
+  -c, --config PATH        Override default & environment variables' values
                            with those in set in the file at 'PATH'. Must be the
                            first option specified.
 
@@ -28,7 +28,15 @@ Variables:
 These variables have default values defined in the script. The defaults can be
 overridden by environment variables. Any environment variables are overridden
 by values set in a '.env' file (if it exists), and in turn by those set in a
-file specified by the '--config-file' option."
+file specified by the '--config' option.
+
+Positional Args:
+
+At the end of the command, you can optionally specify the directory, branch,
+and repository as well. Earlier values are required to specify later ones. For
+example, in order to specify <branch>, you must also specify <directory>. Like
+the command-line options, these will override values set in configuration files
+and the environment."
 
 parse_args() {
 	# Set args from a local environment file.
@@ -37,7 +45,7 @@ parse_args() {
 	fi
 
 	# Set args from file specified on the command-line.
-	if [[ $1 = "-c" || $1 = "--config-file" ]]; then
+	if [[ $1 = "-c" || $1 = "--config" ]]; then
 		source "$2"
 		shift 2
 	fi
@@ -48,7 +56,7 @@ parse_args() {
 	while : ; do
 		if [[ $1 = "-h" || $1 = "--help" ]]; then
 			echo "$help_message"
-			return 0
+			exit 0
 		elif [[ $1 = "-v" || $1 = "--verbose" ]]; then
 			verbose=true
 			shift
@@ -61,6 +69,16 @@ parse_args() {
 		elif [[ $1 = "-n" || $1 = "--no-hash" ]]; then
 			GIT_DEPLOY_APPEND_HASH=false
 			shift
+		elif [[ -n ${1} ]]; then
+			# Set positional args
+			GIT_DEPLOY_DIR=$1
+			if [[ -n $2 ]]; then
+				GIT_DEPLOY_BRANCH=$2
+			fi
+			if [[ -n $3 ]]; then
+				GIT_DEPLOY_REPO=$3
+			fi
+			break
 		else
 			break
 		fi

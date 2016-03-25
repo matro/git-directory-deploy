@@ -37,9 +37,12 @@ Do this every time you want to deploy, or have your CI server do it.
 5. run `./deploy.sh`
 
 ### options
+
+`deploy.sh [--config <FILE>] [<options>] [<directory> [<branch> [<repository>]]]`
+
 `-h`, `--help`: show the program's help info.
 
-`-c`, `--config-file`: specify a file that overrides the script's default configuration, or those values set in `.env`. The syntax for this file should be normal `var=value` declarations. __This option _must_ come first on the command-line__.
+`-c`, `--config`: specify a file that overrides the script's default configuration, or those values set in `.env`. The syntax for this file should be normal `var=value` declarations. __This option _must_ come first on the command-line__.
 
 `-m`, `--message <message>`: specify message to be used for the commit on `deploy_branch`. By default, the message is the title of the source commit, prepended with 'publish: '.
 
@@ -48,3 +51,5 @@ Do this every time you want to deploy, or have your CI server do it.
 `-v`, `--verbose`: echo expanded commands as they are executed, using the xtrace option. This can be useful for debugging, as the output will include the values of variables that are being used, such as $commit_title and $deploy_directory. However, the script makes special effort to not output the value of $repo, as it may contain a secret authentication token.
 
 `-e`, `--allow-empty`: allow deployment of an empty directory. By default, the script will abort if `deploy_directory` is empty.
+
+`[<directory> [<branch> [<repository>]]]`: set the directory/branch/repository. __These options _must_ come at the end of the command-line__. Also, in order to specify later options, you _must_ specify each earlier one. So in order to specify "repository", you need to also specify "directory" and "branch".

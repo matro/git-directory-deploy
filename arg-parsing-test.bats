@@ -28,7 +28,7 @@ write_env_file() {
 }
 
 write_conf_file() {
-	# Write a config-file to override '.env'.
+	# Write a configuration file to override '.env'.
 	cat <<-EOF > conf
 		GIT_DEPLOY_APPEND_HASH=conf-file
 	EOF
@@ -59,7 +59,7 @@ write_conf_file() {
 	write_env_file
 	write_conf_file
 
-	parse_args --config-file conf
+	parse_args --config conf
 	assert that "$append_hash" = "conf-file"
 }
 
@@ -68,11 +68,17 @@ write_conf_file() {
 	write_env_file
 	write_conf_file
 
-	parse_args --config-file conf --no-hash
+	parse_args --config conf --no-hash
 	assert that "$append_hash" = "false"
 }
 @test '        sets a commit message with spaces in it.' {
 	parse_args --message "a message"
 	assert that "$commit_message" = "a message"
+}
+@test '        correctly handles positional args.' {
+	parse_args pos-dir pos-branch pos-repo
+	assert that "$deploy_directory" = "pos-dir"
+	assert that "$deploy_branch" = "pos-branch"
+	assert that "$repo" = "pos-repo"
 }
 
