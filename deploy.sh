@@ -61,6 +61,8 @@ parse_args() {
 		elif [[ $1 = "-n" || $1 = "--no-hash" ]]; then
 			GIT_DEPLOY_APPEND_HASH=false
 			shift
+		elif [[ $1 = "--no-push" ]]; then
+			nopush=true
 		else
 			break
 		fi
@@ -166,6 +168,10 @@ incremental_deploy() {
 commit+push() {
 	set_user_id
 	git --work-tree "$deploy_directory" commit -m "$commit_message"
+
+	if [ $nopush ]; then
+		break
+	fi
 
 	disable_expanded_output
 	#--quiet is important here to avoid outputting the repo URL, which may contain a secret token
