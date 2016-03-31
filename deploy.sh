@@ -62,7 +62,7 @@ parse_args() {
 			GIT_DEPLOY_APPEND_HASH=false
 			shift
 		elif [[ $1 = "--no-push" ]]; then
-			nopush=true
+			GIT_DEPLOY_NO_PUSH=true
 		else
 			break
 		fi
@@ -84,6 +84,9 @@ parse_args() {
 
 	#append commit hash to the end of message by default
 	append_hash=${GIT_DEPLOY_APPEND_HASH:-true}
+
+	#push by default
+	nopush=${GIT_DEPLOY_NO_PUSH:-false}
 }
 
 main() {
@@ -169,14 +172,12 @@ commit+push() {
 	set_user_id
 	git --work-tree "$deploy_directory" commit -m "$commit_message"
 
-	if [ $nopush ]; then
-		break
+	if [ $nopush = "false" ]; then
+		disable_expanded_output
+		#--quiet is important here to avoid outputting the repo URL, which may contain a secret token
+		git push --quiet $repo $deploy_branch
+		enable_expanded_output
 	fi
-
-	disable_expanded_output
-	#--quiet is important here to avoid outputting the repo URL, which may contain a secret token
-	git push --quiet $repo $deploy_branch
-	enable_expanded_output
 }
 
 #echo expanded commands as they are executed (for debugging)
